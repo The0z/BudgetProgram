@@ -88,32 +88,39 @@ class Category:
 def create_spend_chart(categories):
     longestCatLen = 0
     totalBal = 0
+    catBal = list()
     for i in range(len(categories)):
-        totalBal += categories[i].balance
+        for j in range(len(categories[i].ledger)):
+            if categories[i].ledger[j].get("amount") < 0:
+                catBal.append(-1*float(categories[i].ledger[j].get("amount")))
+        totalBal += catBal[i]
         if len(categories[i].categoryName) > longestCatLen:
             longestCatLen = len(categories[i].categoryName)
 
     bubbleVal = list()
     catList = list()
     for i in range(len(categories)):
-        num = ((categories[i].balance/totalBal * 100)//10)
+        num = ((catBal[i]/totalBal * 100)//10)
         # update both x to spacebar
-        bubbleVal.append(("o"*int(num)).rjust(11, " "))
+        bubbleVal.append(("o"*(int(num)+1)).rjust(11, " "))
         catList.append(categories[i].categoryName.ljust(longestCatLen, " "))
 
-    print("Percentage spent by Catergory")
-    numCharRow = int(11 + longestCatLen)
-    numCharCol = int(5 + len(categories)*3)
+    chartMsg = "Percentage spent by category\n"
 
     percent = 100
-    chartMsg = ""
     for i in range(11):
         chartMsg += str(percent).rjust(3) + "| "
         percent -= 10
         for j in range(len(bubbleVal)):
             chartMsg += bubbleVal[j][i] + "  "
         chartMsg += "\n"
-    chartMsg += "    " + "-"*(len(categories)*3 + 1)
+    chartMsg += " "*4 + "-"*(len(categories)*3 + 1) + "\n"
 
     # Now printing the catergories
-    print(chartMsg)
+    for i in range(longestCatLen):
+        chartMsg += " "*5
+        for j in range(len(catList)):
+            chartMsg += catList[j][i] + "  "
+        if(i < longestCatLen - 1):
+            chartMsg += "\n"
+    return chartMsg
