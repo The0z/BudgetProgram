@@ -1,3 +1,5 @@
+import math
+
 class Category:
 
     def __init__(self, Category):
@@ -14,7 +16,8 @@ class Category:
         title = self.titleMaker(MAX_LEN)
         for i in range(len(self.ledger)):
             dsc = dsc + "\n" + self.descriptionMaker(MAX_DSC, MAX_AMT, i)
-        return title + dsc
+        formatBalance = "{:.2f}".format(self.balance)
+        return title + dsc + "\n" + "Total: " + formatBalance
 
     def titleMaker(self, MAX_LEN):
         titleSize = len(self.categoryName)
@@ -83,4 +86,34 @@ class Category:
 
 
 def create_spend_chart(categories):
-    print("Hello World")
+    longestCatLen = 0
+    totalBal = 0
+    for i in range(len(categories)):
+        totalBal += categories[i].balance
+        if len(categories[i].categoryName) > longestCatLen:
+            longestCatLen = len(categories[i].categoryName)
+
+    bubbleVal = list()
+    catList = list()
+    for i in range(len(categories)):
+        num = ((categories[i].balance/totalBal * 100)//10)
+        # update both x to spacebar
+        bubbleVal.append(("o"*int(num)).rjust(11, " "))
+        catList.append(categories[i].categoryName.ljust(longestCatLen, " "))
+
+    print("Percentage spent by Catergory")
+    numCharRow = int(11 + longestCatLen)
+    numCharCol = int(5 + len(categories)*3)
+
+    percent = 100
+    chartMsg = ""
+    for i in range(11):
+        chartMsg += str(percent).rjust(3) + "| "
+        percent -= 10
+        for j in range(len(bubbleVal)):
+            chartMsg += bubbleVal[j][i] + "  "
+        chartMsg += "\n"
+    chartMsg += "    " + "-"*(len(categories)*3 + 1)
+
+    # Now printing the catergories
+    print(chartMsg)
